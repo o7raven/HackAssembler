@@ -1,2 +1,2 @@
 all:
-	g++ main.cpp headers/parser.cpp -o Assembler
+	g++ main.cpp headers/*.cpp -o Assembler
