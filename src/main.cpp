@@ -6,13 +6,11 @@
 #include <bitset>
 
 #include "headers/parser.hpp"
-
+#include "headers/code.hpp"
 bool isAinstruction(const std::string& instruction);
 std::string toBinary(const std::string& instruction);
 bool isCinstruction(const std::string& instruction);
 int toInt(const std::string& str);
-
-
 
 int main(int argc, char* argv[]){
     std::string instruction;
@@ -23,6 +21,7 @@ int main(int argc, char* argv[]){
         return 1;
     }
 
+    //std::string hackName = "main.hack";
     std::string hackName = strtok(argv[1], ".");
     hackName.append(".hack");
     std::ofstream hack(hackName);
@@ -33,14 +32,22 @@ int main(int argc, char* argv[]){
         if(isAinstruction(instruction)){
             std::string instructionNum = instruction.substr(1, instruction.length());
             std::string binary = toBinary(instructionNum);
+            //std::cout << binary << std::endl;
             hack << "000" << binary << "\n";
             continue;
         }if(isCinstruction(instruction)){
-            std::cout << instruction << std::endl;
             Parser parser(instruction);
+            Code code;
             std::string comp = parser.comp();
             std::string dest = parser.dest();
             std::string jump = parser.jump();
+            
+            std::string compBits = code.comp(comp);
+            std::string destBits = code.dest(dest);
+            std::string jumpBits = code.jump(jump);
+            //std::cout << destBits << compBits << jumpBits << std::endl;
+            hack << "111" << compBits  << destBits << jumpBits << "\n";
+            continue;
         }
 
         //std::cout << instruction << std::endl;

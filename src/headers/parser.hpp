@@ -6,7 +6,7 @@ private:
     std::string instruction;
 public:
     Parser(const std::string& _instruction);
-    inline std::string comp();
-    inline std::string dest();
-    inline std::string jump();
+    std::string comp();
+    std::string dest();
+    std::string jump();
 };
