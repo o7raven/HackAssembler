@@ -1,3 +1,4 @@
+THE LABELS AND VARIABLES AREN'T WORKING YET BUT THEY WILL SOON
 # Hack Assembler
 
 This is a C++ implementation of an assembler for the "Hack computer" designed in the "Nand to Tetris" course.
