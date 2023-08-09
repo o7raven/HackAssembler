@@ -3,6 +3,7 @@
 #include <string.h>
 #include <sstream>
 #include <bitset>
+#include <stdio.h>
 
 #include "headers/parser.hpp"
 #include "headers/code.hpp"
@@ -13,8 +14,8 @@ bool isCinstruction(const std::string& instruction);
 bool isLabel(const std::string& instruction);
 int toInt(const std::string& str);
 void processFile(std::ifstream& assembly,const std::string& hackName);
-void cleanFile(std::ifstream& assembly,const std::string& hackName);
-void checkLabelsVars(const std::string& hackName);
+void cleanFile(std::ifstream& assembly,const std::string& tempFileName);
+void checkLabelVars(const std::string& hackName);
 
 int main(int argc, char* argv[]){
     std::string instruction;
@@ -64,11 +65,12 @@ std::string toBinary(const std::string& instruction){
 }
 
 void processFile(std::ifstream& assembly, const std::string& hackName){
-    cleanFile(assembly, hackName);
-    checkLabelsVars(hackName);
+    cleanFile(assembly,hackName);
+    checkLabelVars(hackName);
 }
 
-void cleanFile(std::ifstream& assembly, const std::string& hackName){
+void cleanFile(std::ifstream& assembly,const std::string& hackName){
+    unsigned int instructionPosition = 1;
     std::string instruction;
     std::ofstream hackFile(hackName);
     while(std::getline(assembly, instruction)){
@@ -77,24 +79,27 @@ void cleanFile(std::ifstream& assembly, const std::string& hackName){
         size_t commentLocation = instruction.find("//");
         if(commentLocation != std::string::npos)
             instruction = instruction.substr(0, commentLocation); 
-        hackFile << instruction << "\n";
-    }
-    assembly.close();
-    hackFile.close();
-}
-void checkLabelsVars(const std::string& hackName){ 
-    unsigned int instructionPosition = 1;
-    std::string instruction;
-    std::ifstream hackRead(hackName);
-    std::ofstream hackWrite(hackName);
-    while(std::getline(hackRead, instruction)){
         if(isLabel(instruction)){
             Labels.label_map.insert({instruction,instructionPosition});
             continue;
         }
-        hackWrite << instruction << "\n";
+        hackFile << instruction << "\n";
         instructionPosition++;
     }
+    assembly.close();
+    hackFile.close();
+}
+void checkLabelVars(const std::string& hackName){ 
+    std::ifstream hackRead(hackName);
+    std::stringstream hackMemoryBuffer;
+    hackMemoryBuffer << hackRead.rdbuf();
+    std::ofstream hackFile(hackName);
+    std::string instruction;
+    hackRead.close();
+    while(std::getline(hackMemoryBuffer, instruction)){
+        hackFile << instruction << "\n";
+    }
+    hackFile.close();
    /*while(std::getline (hackFile, instruction)){
         if(instruction == "" || instruction.substr(0,2) == "//")
             continue;
