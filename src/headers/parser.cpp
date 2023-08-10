@@ -11,9 +11,15 @@ std::string Parser::comp(){
         return instruction.substr(compStart + 1, instruction.length());
     else if(compStart != std::string::npos && compEnd != std::string::npos)
         return instruction.substr(compStart + 1, compEnd - compStart - 1);
+    else if(compStart == std::string::npos && compEnd != std::string::npos)
+        return instruction.substr(0,compEnd);
 }
 std::string Parser::dest(){
-    return instruction.substr(0, instruction.find('='));
+    if(instruction.find('=') != std::string::npos)
+        return instruction.substr(0, instruction.find('='));
+    else{
+        return null;
+    }
 }
 std::string Parser::jump(){
     size_t jumpStart = instruction.find(';');

@@ -4,6 +4,7 @@ class Parser
 {
 private:
     std::string instruction;
+    std::string null = "null";
 public:
     Parser(const std::string& _instruction);
     std::string comp();
