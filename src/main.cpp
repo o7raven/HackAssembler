@@ -4,6 +4,7 @@
 #include <sstream>
 #include <bitset>
 #include <stdio.h>
+#include <exception>
 
 #include "headers/parser.hpp"
 #include "headers/code.hpp"
@@ -16,24 +17,42 @@ int toInt(const std::string& str);
 void processFile(std::ifstream& assembly,const std::string& hackName);
 void cleanFile(std::ifstream& assembly,const std::string& tempFileName);
 void checkLabelVars(const std::string& hackName);
+void assemble(const std::string& hackName);
+std::string removeSpaces(const std::string& memoryBuffer);
+
 
 int main(int argc, char* argv[]){
-    std::string instruction;
-    std::string assemblyName = argv[1];
-    std::ifstream assembly(assemblyName);
-    if(!assembly.good()){
-        std::cout << "File doesn't exist" << std::endl;
-        return 1;
+    try{
+        std::string instruction;
+        std::string assemblyName = argv[1];
+        std::ifstream assembly(assemblyName);
+        if(!assembly.good()){
+            std::cout << "File doesn't exist" << std::endl;
+            return 1;
+        }
+        std::string hackName = strtok(argv[1], ".");
+        hackName.append(".hack");
+        processFile(assembly, hackName);
     }
-    std::string hackName = strtok(argv[1], ".");
-    hackName.append(".hack");
-    processFile(assembly, hackName);
+    catch (std::exception const &exc)
+    {
+        std::cerr << "Exception caught: " << exc.what() << "\n";
+    }
+    catch (...)
+    {
+        std::cerr << "Unknown exception caught\n";
+    }
     return 0;   
 }
 
 bool isAinstruction(const std::string& instruction){
-    if(instruction.at(0) == '@')
+    if(instruction.at(0) == '@'){
+        for(size_t i = 1; i<instruction.size(); i++){
+            if(!std::isdigit(instruction[i]))
+                return false;
+        }
         return true;
+    } 
     return false;
 }
 
@@ -67,20 +86,26 @@ std::string toBinary(const std::string& instruction){
 void processFile(std::ifstream& assembly, const std::string& hackName){
     cleanFile(assembly,hackName);
     checkLabelVars(hackName);
+    assemble(hackName);
 }
 
 void cleanFile(std::ifstream& assembly,const std::string& hackName){
-    unsigned int instructionPosition = 1;
-    std::string instruction;
     std::ofstream hackFile(hackName);
-    while(std::getline(assembly, instruction)){
+    std::string cleanInstruction;
+    unsigned int instructionPosition = 1;
+
+    while(std::getline(assembly, cleanInstruction)){
+        std::string instruction = removeSpaces(cleanInstruction);
+        
         if(instruction == "" || instruction.substr(0,2) == "//")
             continue;
         size_t commentLocation = instruction.find("//");
         if(commentLocation != std::string::npos)
-            instruction = instruction.substr(0, commentLocation); 
+            instruction = instruction.substr(0, commentLocation);
         if(isLabel(instruction)){
-            Labels.label_map.insert({instruction,instructionPosition});
+            std::string modifiedInstruction = cleanInstruction.substr(1,(cleanInstruction.length()-2));
+            Labels.label_map.insert({modifiedInstruction,instructionPosition-1});
+            //std::cout << modifiedInstruction<<std::endl;
             continue;
         }
         hackFile << instruction << "\n";
@@ -97,17 +122,34 @@ void checkLabelVars(const std::string& hackName){
     std::string instruction;
     hackRead.close();
     while(std::getline(hackMemoryBuffer, instruction)){
-        hackFile << instruction << "\n";
+        if(instruction.at(0) == '@' && !(isAinstruction(instruction))){
+            std::string label = instruction.substr(1, instruction.length());
+            hackFile << "@" << Labels.label_map[label] << "\n";
+            //std::cout << Labels.label_map[label] << std::endl;
+            //std::cout  << label << "\n";
+            continue;
+        }
+    hackFile << instruction << "\n";
     }
     hackFile.close();
-   /*while(std::getline (hackFile, instruction)){
+
+}
+void assemble(const std::string& hackName){
+    std::ifstream tempHackRead(hackName);
+    std::stringstream hackMemoryBuffer;
+    hackMemoryBuffer << tempHackRead.rdbuf();
+    tempHackRead.close();
+
+    std::string instruction;
+    std::ofstream hackFile(hackName);   
+    while(std::getline (hackMemoryBuffer, instruction)){
         if(instruction == "" || instruction.substr(0,2) == "//")
             continue;
         if(isAinstruction(instruction)){
             std::string instructionNum = instruction.substr(1, instruction.length());
             std::string binary = toBinary(instructionNum);
             //std::cout << binary << std::endl;
-            hack << "000" << binary << "\n";
+            hackFile << "000" << binary << "\n";
             continue;
         }if(isCinstruction(instruction)){
             Parser parser(instruction);
@@ -120,10 +162,20 @@ void checkLabelVars(const std::string& hackName){
             std::string destBits = code.dest(dest);
             std::string jumpBits = code.jump(jump);
             //std::cout << destBits << compBits << jumpBits << std::endl;
-            hack << "111" << compBits  << destBits << jumpBits << "\n";
+            hackFile << "111" << compBits  << destBits << jumpBits << "\n";
             continue;
         }
 
         //std::cout << instruction << std::endl;
-    }*/
+    }
+    hackFile.close();
+}
+std::string removeSpaces(const std::string& input){
+    std::string result;
+    for(char c : input){
+        if(!std::isspace(c)){
+            result += c;
+        }
+    }
+    return result;
 }
