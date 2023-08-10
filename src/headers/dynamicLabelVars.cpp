@@ -1,7 +1,11 @@
-#include "labels.hpp"
+#include "dymanicLabelVars.hpp"
 
-Labels::Labels(){
+dyn_map::dyn_map(){
     label_map = {
+        {"SCREEN", 16384},
+        {"KBD", 24576}
+    };
+    var_map = {
         {"R0", 0},
         {"R1", 1},
         {"R2", 2},
@@ -18,7 +22,10 @@ Labels::Labels(){
         {"R13", 13},
         {"R14", 14},
         {"R15", 15},
-        {"SCREEN", 16384},
-        {"KBD", 24576}
+        {"SP", 0},
+        {"LCL", 1},
+        {"ARG", 2},
+        {"THIS", 3},
+        {"THAT", 4}
     };
 };

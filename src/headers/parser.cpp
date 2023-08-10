@@ -25,5 +25,5 @@ std::string Parser::jump(){
     size_t jumpStart = instruction.find(';');
     if(jumpStart != std::string::npos)
         return instruction.substr(jumpStart + 1, instruction.length());
-    return "";
+    return null;
 }
