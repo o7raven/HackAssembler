@@ -77,7 +77,7 @@ int toInt(const std::string& str){
 }
 std::string toBinary(const std::string& instruction){
     unsigned int num = toInt(instruction);
-    std::bitset<13> binary(num);
+    std::bitset<15> binary(num);
     std::string binaryString = binary.to_string();
     //std::cout << binaryString <<  std::endl;
     return binaryString;
@@ -96,7 +96,6 @@ void cleanFile(std::ifstream& assembly,const std::string& hackName){
 
     while(std::getline(assembly, cleanInstruction)){
         std::string instruction = removeSpaces(cleanInstruction);
-        
         if(instruction == "" || instruction.substr(0,2) == "//")
             continue;
         size_t commentLocation = instruction.find("//");
@@ -143,13 +142,11 @@ void assemble(const std::string& hackName){
     std::string instruction;
     std::ofstream hackFile(hackName);   
     while(std::getline (hackMemoryBuffer, instruction)){
-        if(instruction == "" || instruction.substr(0,2) == "//")
-            continue;
         if(isAinstruction(instruction)){
             std::string instructionNum = instruction.substr(1, instruction.length());
             std::string binary = toBinary(instructionNum);
             //std::cout << binary << std::endl;
-            hackFile << "000" << binary << "\n";
+            hackFile << "0" << binary << "\n";
             continue;
         }if(isCinstruction(instruction)){
             Parser parser(instruction);
