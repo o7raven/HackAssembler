@@ -1,4 +1,3 @@
-THE LABELS AND VARIABLES AREN'T WORKING YET BUT THEY WILL SOON
 # Hack Assembler
 
 This is a C++ implementation of an assembler for the "Hack computer" designed in the "Nand to Tetris" course.
@@ -8,8 +7,8 @@ The "Hack computer" is a simple computer architecture created in the "Nand to Te
 ## Features
 
 - Translates hack assembly code to machine code.
-- Supports all the instructions and addressing modes defined in the hack architecture (Not yet).
-- Handles labels and variables defined in the assembly code (Not yet).
+- Supports all the instructions and addressing modes defined in the hack architecture.
+- Handles labels and variables defined in the assembly code.
 - Generates a binary output file containing the translated machine code.
 
 ## Getting Started
@@ -21,8 +20,6 @@ The "Hack computer" is a simple computer architecture created in the "Nand to Te
 
 ## Build the asssembler
 ```cd HackAssembler
-mkdir build
-cd build
 make
 ```
 
@@ -33,7 +30,7 @@ The assembler argument must be only the name of the assembly program, otherwise 
 
 # Limitations
 
-  The assembler assumes that the input assembly code is written in the hack assembly language, flawless and follows the syntax and rules specified in the "Nand to Tetris" course.
+The assembler assumes that the input assembly code is written in the hack assembly language, flawless and follows the syntax and rules specified in the "Nand to Tetris" course.
 
 # Contributing
 
